@@ -139,11 +139,16 @@ def page_needs_ocr(page: pymupdf.Page, text: str):
     return coverage >= 0.5 and letters < 6 * MIN_TEXT_LAYER_CHARS
 
 
+def page_zoom(page: pymupdf.Page, dpi: int):
+    """Масштаб отрисовки страницы для заданного разрешения (с ограничением по размеру)."""
+    longest = max(page.rect.width, page.rect.height) or 1.0
+    return min(dpi / 72.0, MAX_OCR_RENDER_PIXELS / longest)
+
+
 def render_page_image(page: pymupdf.Page, dpi: int):
     """Отрисовать страницу в оттенках серого (PGM) для распознавания."""
     pymupdf = require("pymupdf")
-    longest = max(page.rect.width, page.rect.height) or 1.0
-    zoom = min(dpi / 72.0, MAX_OCR_RENDER_PIXELS / longest)
+    zoom = page_zoom(page, dpi)
     pixmap = page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom), colorspace=pymupdf.csGRAY)
     return bytes(pixmap.tobytes("pgm"))
 

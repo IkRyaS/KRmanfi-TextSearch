@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "krmanfi-search"
 version = "1.0.0"
-description = "KRmanfi Text Search: поиск текста в документах, сканах PDF и ZIP-архивах (офлайн)."
+description = "Поиск по документам: текст в PDF, сканах, Office-файлах и ZIP-архивах (офлайн)."
 readme = "README.md"
 license = "AGPL-3.0-or-later"
 license-files = ["LICENSE"]

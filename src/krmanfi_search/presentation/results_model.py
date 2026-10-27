@@ -7,9 +7,10 @@ from pathlib import PurePosixPath
 from typing import override
 
 from PySide6.QtCore import QModelIndex, QPersistentModelIndex, QSortFilterProxyModel, Qt
-from PySide6.QtGui import QStandardItem, QStandardItemModel
+from PySide6.QtGui import QBrush, QStandardItem, QStandardItemModel
 
 from krmanfi_search.domain import SearchHit
+from krmanfi_search.presentation.theme import FILE_ROW_BG, FILE_ROW_FG, PAGE_ROW_BG
 
 type Index = QModelIndex | QPersistentModelIndex
 
@@ -21,7 +22,7 @@ COL_WHERE = 0
 COL_LOCATION = 1
 COL_FRAGMENT = 2
 COL_CONTEXT = 3
-HEADERS = ("Где", "Страница / место", "Фрагмент", "Контекст")
+HEADERS = ("Файл", "Место", "Совпадение", "Контекст")
 
 
 class NodeKind(StrEnum):
@@ -56,6 +57,22 @@ def _row():
         item.setEditable(False)
         items.append(item)
     return items
+
+
+def _paint_file_row(row: list[QStandardItem]):
+    """Строка файла: светлый бирюзовый фон, тёмный жирный текст."""
+    for item in row:
+        font = item.font()
+        font.setBold(True)
+        item.setFont(font)
+        item.setBackground(QBrush(FILE_ROW_BG))
+        item.setForeground(QBrush(FILE_ROW_FG))
+
+
+def _paint_page_row(row: list[QStandardItem]):
+    """Строка-группа страницы: еле заметный серо-голубой фон."""
+    for item in row:
+        item.setBackground(QBrush(PAGE_ROW_BG))
 
 
 class SearchResultsModel(QStandardItemModel):
@@ -132,6 +149,7 @@ class SearchResultsModel(QStandardItemModel):
         row[COL_WHERE].setData(number, HIT_ROLE)
         row[COL_WHERE].setData(hit.display_path.lower(), SORT_ROLE)
         row[COL_LOCATION].setText(hit.display_path)
+        _paint_file_row(row)
         self.invisibleRootItem().appendRow(row)
         self._files[hit.display_path] = row[COL_WHERE]
         return row[COL_WHERE]
@@ -146,6 +164,7 @@ class SearchResultsModel(QStandardItemModel):
         row[COL_WHERE].setData(_sort_key(hit), SORT_ROLE)
         row[COL_LOCATION].setText(location_label(hit))
         row[COL_FRAGMENT].setText(f"вхождений: {hit.match_count}")
+        _paint_page_row(row)
         return row
 
     def _hit_row(self, hit: SearchHit, number: int, label: str):
