@@ -60,7 +60,8 @@ def add_tesseract():
     if bundle_tesseract.bundle(APP):
         return
     print(
-        "ВНИМАНИЕ: Tesseract не найден на этой машине, сканы PDF в сборке распознаваться не будут.\n"
+        "ВНИМАНИЕ: Tesseract не найден на этой машине,"
+        " сканы PDF в сборке распознаваться не будут.\n"
         "  Windows: winget install UB-Mannheim.TesseractOCR\n"
         "  Linux:   sudo apt install tesseract-ocr tesseract-ocr-rus tesseract-ocr-eng\n"
         "  После установки запустите сборку ещё раз."

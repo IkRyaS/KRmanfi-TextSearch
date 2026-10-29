@@ -89,7 +89,11 @@ QPushButton {{
 }}
 QPushButton:hover {{ background: {TEAL[50]}; border-color: {TEAL[300]}; color: {TEAL[800]}; }}
 QPushButton:pressed {{ background: {TEAL[100]}; }}
-QPushButton:disabled {{ background: {SLATE[100]}; color: {SLATE[400]}; border-color: {SLATE[200]}; }}
+QPushButton:disabled {{
+    background: {SLATE[100]};
+    color: {SLATE[400]};
+    border-color: {SLATE[200]};
+}}
 QPushButton:focus {{ border-color: {TEAL[500]}; }}
 
 QPushButton#primary {{
@@ -102,10 +106,18 @@ QPushButton#primary {{
 }}
 QPushButton#primary:hover {{ background: {TEAL[500]}; border-color: {TEAL[600]}; color: white; }}
 QPushButton#primary:pressed {{ background: {TEAL[700]}; }}
-QPushButton#primary:disabled {{ background: {TEAL[100]}; border-color: {TEAL[100]}; color: {TEAL[400]}; }}
+QPushButton#primary:disabled {{
+    background: {TEAL[100]};
+    border-color: {TEAL[100]};
+    color: {TEAL[400]};
+}}
 
 QPushButton#danger {{ color: {RED['text']}; }}
-QPushButton#danger:hover {{ background: {RED['bg']}; border-color: {RED['border']}; color: {RED['text']}; }}
+QPushButton#danger:hover {{
+    background: {RED['bg']};
+    border-color: {RED['border']};
+    color: {RED['text']};
+}}
 QPushButton#danger:disabled {{ color: {SLATE[400]}; }}
 
 QPushButton#link {{
@@ -122,7 +134,13 @@ QCheckBox::indicator:hover {{ border-color: {TEAL[500]}; }}
 QCheckBox::indicator:checked {{ background: {TEAL[600]}; border: 4px solid {TEAL[600]}; }}
 QCheckBox::indicator:checked:hover {{ background: {TEAL[500]}; border-color: {TEAL[500]}; }}
 
-QProgressBar {{ background: {SLATE[200]}; border: none; border-radius: 3px; max-height: 6px; min-height: 6px; }}
+QProgressBar {{
+    background: {SLATE[200]};
+    border: none;
+    border-radius: 3px;
+    max-height: 6px;
+    min-height: 6px;
+}}
 QProgressBar::chunk {{ background: {TEAL[500]}; border-radius: 3px; }}
 
 QLabel#status {{ color: {SLATE[600]}; }}

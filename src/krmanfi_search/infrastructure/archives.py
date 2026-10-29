@@ -139,7 +139,9 @@ def extract_chain(display_path: str, dest: Path, separator: str = "!/"):
     current = Path(head)
     for level, name in enumerate(inner):
         with ZipReader(current) as reader:
-            info = next(i for i in reader.members() if i.filename == name)
+            info = next((i for i in reader.members() if i.filename == name), None)
+            if info is None:
+                raise KeyError(name)
             folder = dest / f"level{level}"
             current = reader.extract(info, folder, MAX_MEMBER_BYTES, 0)
     return current
