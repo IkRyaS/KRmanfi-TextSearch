@@ -4,12 +4,11 @@ Windows: берётся установленный Tesseract-OCR (``winget insta
 недостающие языки скачиваются с GitHub (tessdata_fast) — только на машине сборки.
 Linux: копируются ``tesseract`` и его библиотеки (кроме glibc), RPATH меняется на ``$ORIGIN/lib``.
 
-Запуск: ``python scripts/bundle_tesseract.py dist/KRmanfiSearch``.
+Вызывается из ``scripts/build.py``.
 """
 
 from __future__ import annotations
 
-import argparse
 import os
 import re
 import shutil
@@ -122,15 +121,19 @@ def bundle_windows(tesseract: Path, target: Path):
     )
 
 
-def main(argv: list[str] | None = None):
-    """Точка входа."""
-    parser = argparse.ArgumentParser(description="Встроить Tesseract в сборку")
-    parser.add_argument("dist", type=Path, help="папка сборки, например dist/KRmanfiSearch")
-    args = parser.parse_args(argv)
+def bundle(dist: Path):
+    """Встроить Tesseract в ``<dist>/vendor/tesseract``.
+
+    Args:
+        dist: Папка сборки PyInstaller, например ``dist/KRmanfiSearch``.
+
+    Returns:
+        ``True``, если Tesseract найден и встроен; ``False``, если его нет на машине сборки.
+    """
     tesseract = find_tesseract()
     if tesseract is None:
-        raise SystemExit("Tesseract не установлен на машине сборки")
-    target = args.dist / "vendor" / "tesseract"
+        return False
+    target = dist / "vendor" / "tesseract"
     if target.exists():
         shutil.rmtree(target)
     target.mkdir(parents=True)
@@ -143,8 +146,4 @@ def main(argv: list[str] | None = None):
     copy_tessdata(tesseract, target / "tessdata")
     size = sum(p.stat().st_size for p in target.rglob("*") if p.is_file())
     print(f"vendor/tesseract: {size / 1024 / 1024:.0f} МБ из {tesseract}")
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+    return True

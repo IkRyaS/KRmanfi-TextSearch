@@ -75,7 +75,7 @@ def test_export_writes_only_visible_rows(qtbot, window, tmp_path, monkeypatch):
 
 
 def test_invalid_regex_shows_message_and_keeps_window_alive(qtbot, window):
-    window.mode.setCurrentText("Регулярное выражение")
+    window.regex.setChecked(True)
     run(qtbot, window, "(")
     assert "Некорректное регулярное выражение" in window.error_label.text()
     assert window.start_btn.isEnabled() and not window.hits

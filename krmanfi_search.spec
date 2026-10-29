@@ -1,10 +1,11 @@
-"""Спецификация PyInstaller: папочная сборка KRmanfi Text Search.
+"""Спецификация PyInstaller: папочная сборка «Поиск по документам».
 
-Запуск: ``pyinstaller --noconfirm --clean krmanfi_search.spec`` (результат — ``dist/KRmanfiSearch``).
+Запускается из ``scripts/build.py`` (``build_windows.bat`` / ``build_linux.sh``).
+Результат: ``dist/KRmanfiSearch/KRmanfiSearch[.exe]``.
+
 python-docx и python-pptx читают шаблоны по путям вида ``<пакет>/parts/../templates``; такие
 пути работают, только если папка ``parts`` физически есть на диске, поэтому в сборку
-добавляются файлы-заглушки. В Windows создаются два exe: оконный ``KRmanfiSearch.exe`` и консольный
-``KRmanfiSearch-console.exe`` (для диагностики и smoke_test.py).
+добавляются файлы-заглушки.
 """
 
 import sys
@@ -64,7 +65,7 @@ analysis = Analysis(
     excludes=EXCLUDES,
 )
 pyz = PYZ(analysis.pure)
-windowed = EXE(
+exe = EXE(
     pyz,
     analysis.scripts,
     [],
@@ -73,17 +74,4 @@ windowed = EXE(
     console=False,
     icon=icon,
 )
-executables = [windowed]
-if sys.platform == "win32":
-    executables.append(
-        EXE(
-            pyz,
-            analysis.scripts,
-            [],
-            exclude_binaries=True,
-            name="KRmanfiSearch-console",
-            console=True,
-            icon=icon,
-        )
-    )
-collected = COLLECT(*executables, analysis.binaries, analysis.datas, name="KRmanfiSearch")
+collected = COLLECT(exe, analysis.binaries, analysis.datas, name="KRmanfiSearch")

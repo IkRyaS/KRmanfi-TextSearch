@@ -15,6 +15,7 @@ from krmanfi_search import __version__
 from krmanfi_search.container import Container
 from krmanfi_search.infrastructure.config import Settings
 from krmanfi_search.presentation.main_window import WINDOW_TITLE, SearchWindow
+from krmanfi_search.presentation.theme import STYLESHEET
 from krmanfi_search.shared.logging import (
     configure_logging,
     get_logger,
@@ -67,6 +68,8 @@ def run(argv: Sequence[str], start_path: Path | None = None, settings: Settings 
     configure_logging(settings.log_level)
     log = get_logger(__name__)
     app = QApplication(list(argv))
+    app.setStyle("Fusion")
+    app.setStyleSheet(STYLESHEET)
     notifier = CrashNotifier()
     install_excepthooks(notifier.failed.emit)
     app.setApplicationName(WINDOW_TITLE)

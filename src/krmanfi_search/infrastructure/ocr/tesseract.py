@@ -6,6 +6,7 @@ import io
 import os
 import sys
 from collections.abc import Sequence
+from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
 
@@ -19,6 +20,18 @@ from krmanfi_search.shared.runtime import vendor_tessdata, vendor_tesseract
 
 WINDOWS_SUBDIRS = ("Tesseract-OCR", "Programs/Tesseract-OCR")
 PSM_AUTO = "--psm 3"
+
+
+@dataclass(frozen=True, slots=True)
+class OcrWord:
+    """Слово, распознанное на изображении, и его рамка в пикселях."""
+
+    text: str
+    left: int
+    top: int
+    width: int
+    height: int
+    line: tuple[int, int, int]
 
 
 def find_tesseract(explicit: str | None = None):
@@ -112,3 +125,38 @@ class TesseractEngine:
             confidences.append(confidence)
         text = "\n".join(" ".join(words) for _, words in sorted(lines.items()))
         return text, float(np.mean(confidences)) if confidences else 0.0
+
+    def words(self, image: bytes, languages: Sequence[str]):
+        """Распознать изображение и вернуть слова с координатами в порядке чтения.
+
+        Raises:
+            DependencyMissingError: Если pytesseract не установлен.
+        """
+        pytesseract = optional_import("pytesseract")
+        if pytesseract is None:
+            raise DependencyMissingError("pytesseract")
+        installed = self.installed_languages()
+        langs = [lang for lang in languages if lang in installed] or ["eng"]
+        data = pytesseract.image_to_data(
+            Image.open(io.BytesIO(image)).convert("RGB"),
+            lang="+".join(langs),
+            config=PSM_AUTO,
+            output_type=pytesseract.Output.DICT,
+            timeout=120,
+        )
+        result = []
+        for index, word in enumerate(data["text"]):
+            if float(data["conf"][index]) < 0 or not str(word).strip():
+                continue
+            line = (data["block_num"][index], data["par_num"][index], data["line_num"][index])
+            result.append(
+                OcrWord(
+                    text=str(word),
+                    left=int(data["left"][index]),
+                    top=int(data["top"][index]),
+                    width=int(data["width"][index]),
+                    height=int(data["height"][index]),
+                    line=line,
+                )
+            )
+        return result

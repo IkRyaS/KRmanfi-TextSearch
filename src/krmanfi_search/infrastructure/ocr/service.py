@@ -13,10 +13,11 @@ from PIL import Image
 from krmanfi_search.infrastructure.ocr.preprocessing import (
     PreprocessOptions,
     detect_orientation,
+    geometry_preview,
     png_bytes,
     preprocess,
 )
-from krmanfi_search.infrastructure.ocr.tesseract import TesseractEngine
+from krmanfi_search.infrastructure.ocr.tesseract import OcrWord, TesseractEngine
 from krmanfi_search.shared.exceptions import DependencyMissingError
 from krmanfi_search.shared.logging import get_logger
 
@@ -56,6 +57,40 @@ def is_blank(processed: Image.Image, options: PreprocessOptions):
     if options.binarization == "none":
         return False
     return float((np.asarray(processed) < 128).mean()) < BLANK_INK_RATIO
+
+
+def word_boxes(words: Sequence[OcrWord], matcher: object):
+    """Рамки слов, попавших в совпадения ``matcher``; по одной рамке на каждую строку текста.
+
+    Текст собирается так же, как при поиске: слова через пробел, строки через перевод строки.
+    """
+    lines = {}
+    for word in words:
+        lines.setdefault(word.line, []).append(word)
+    text = ""
+    spans = []
+    for line_index, key in enumerate(sorted(lines)):
+        if line_index:
+            text += "\n"
+        for word_index, word in enumerate(lines[key]):
+            if word_index:
+                text += " "
+            spans.append((len(text), len(text) + len(word.text), word))
+            text += word.text
+    boxes = []
+    for match in matcher.find(text):
+        chosen = [w for start, end, w in spans if start < match.end and end > match.start]
+        for key in sorted({w.line for w in chosen}):
+            row = [w for w in chosen if w.line == key]
+            boxes.append(
+                (
+                    min(w.left for w in row),
+                    min(w.top for w in row),
+                    max(w.left + w.width for w in row),
+                    max(w.top + w.height for w in row),
+                )
+            )
+    return boxes
 
 
 class OcrService:
@@ -146,6 +181,33 @@ class OcrService:
             if _good_enough(result.text, result.confidence):
                 break
         return best
+
+    def locate(self, image: bytes, colour: bytes, matcher: object):
+        """Найти совпадения на странице-скане и вернуть её картинку с рамками.
+
+        Args:
+            image: Страница в оттенках серого — то же, что подавалось на распознавание.
+            colour: Та же страница в цвете и в том же размере.
+            matcher: Стратегия сопоставления (метод ``find``).
+
+        Returns:
+            ``(цветное изображение страницы после поворота и выравнивания, рамки)``; рамки —
+            кортежи ``(x0, y0, x1, y1)`` в пикселях этого изображения.
+
+        Raises:
+            DependencyMissingError: Если Tesseract недоступен.
+        """
+        if not self._engine.available():
+            raise DependencyMissingError("tesseract")
+        options = self._variants()[0]
+        rotation = self.recognize(image).rotation
+        picture = Image.open(io.BytesIO(image)).convert("RGB")
+        turned = picture.rotate(-rotation, expand=True) if rotation else picture
+        processed, report = preprocess(turned, options)
+        words = self._engine.words(png_bytes(processed), self._languages)
+        shown = Image.open(io.BytesIO(colour)).convert("RGB")
+        shown = shown.rotate(-rotation, expand=True) if rotation else shown
+        return geometry_preview(shown, options, report), word_boxes(words, matcher)
 
     def as_callable(self):
         """Адаптер «изображение → текст» для извлекателя PDF."""

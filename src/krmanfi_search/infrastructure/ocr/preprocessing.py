@@ -181,6 +181,31 @@ def preprocess(image: Image.Image, opts: PreprocessOptions):
     return Image.fromarray(gray), report
 
 
+def geometry_preview(image: Image.Image, opts: PreprocessOptions, report: dict):
+    """Цветная копия страницы с той же геометрией, что у результата ``preprocess``.
+
+    Повторяет увеличение и выравнивание наклона, но без шумоподавления и бинаризации,
+    поэтому рамки слов, найденные на обработанном изображении, подходят и к этой копии.
+
+    Args:
+        image: Исходное изображение (то же, что подавалось в ``preprocess``).
+        opts: Те же параметры, что и в ``preprocess``.
+        report: Отчёт, который вернул ``preprocess``.
+    """
+    img = ImageOps.exif_transpose(image).convert("RGB")
+    if opts.upscale_min_side and min(img.size) < opts.upscale_min_side:
+        factor = min(opts.upscale_min_side / max(min(img.size), 1), 4.0)
+        img = img.resize(
+            (int(img.width * factor), int(img.height * factor)), Image.Resampling.LANCZOS
+        )
+    angle = float(report.get("deskew_deg", 0.0))
+    if abs(angle) >= 0.2:
+        img = img.rotate(
+            angle, resample=Image.Resampling.BICUBIC, expand=True, fillcolor=(255, 255, 255)
+        )
+    return img
+
+
 def detect_orientation(image: Image.Image):
     """Text rotation (0/90/180/270) through Tesseract OSD; 0 if unavailable."""
     pytesseract = optional_import("pytesseract")
