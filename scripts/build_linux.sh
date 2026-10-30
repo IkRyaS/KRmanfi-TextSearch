@@ -2,7 +2,7 @@
 # Сборка «Поиск по документам» для Linux: только uv. Результат: dist/KRmanfi-Search-linux-x64.tar.gz
 # Собирайте на Ubuntu 22.04 или новее: готовый файл работает на системах с такой же или более новой glibc.
 set -euo pipefail
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 export PYTHONUTF8=1
 
 echo "============================================================"
@@ -17,7 +17,7 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 
 # setup_linux.sh ничего не ставит сам: проверяет Tesseract и библиотеки Qt и печатает команду apt.
-if ! sh ./setup_linux.sh; then
+if ! sh ./scripts/setup_linux.sh; then
     echo
     read -r -p "Продолжить сборку без этого? [y/N] " answer
     case "$answer" in

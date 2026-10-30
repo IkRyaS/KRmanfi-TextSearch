@@ -13,7 +13,7 @@ from pathlib import Path
 
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 
-ROOT = Path(SPECPATH)
+ROOT = Path(SPECPATH).parent
 LAZY_MODULES = ["docx", "openpyxl", "pptx", "pymupdf", "pytesseract", "cv2", "numpy", "PIL"]
 EXCLUDES = [
     "tkinter",

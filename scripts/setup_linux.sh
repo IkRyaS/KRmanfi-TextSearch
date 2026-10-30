@@ -1,7 +1,9 @@
 #!/usr/bin/env sh
 # Проверка Linux-окружения для KRmanfi Text Search. Ничего не устанавливает сама:
 # только сообщает, чего не хватает, и печатает готовую команду для apt.
-cd "$(dirname "$0")" || exit 1
+here=$(dirname "$0")
+[ -f "$here/../pyproject.toml" ] && here="$here/.."
+cd "$here" || exit 1
 missing=""
 note() { printf '%s\n' "$1"; }
 
@@ -30,7 +32,7 @@ need_lib libEGL.so.1 libegl1
 need_lib libfontconfig.so.1 libfontconfig1
 
 if [ -z "$missing" ]; then
-    note "Всё необходимое установлено. Запуск: ./run.sh"
+    note "Всё необходимое установлено. Запуск: scripts/run.sh"
     exit 0
 fi
 note ""

@@ -47,7 +47,7 @@
 **Запуск без сборки:**
 
 ```bash
-uv run krmanfi-search        # или run.bat / ./run.sh
+uv run krmanfi-search        # или scripts\run.bat / scripts/run.sh
 ```
 
 Для распознавания сканов в этом режиме нужен Tesseract: Windows —
@@ -58,8 +58,8 @@ uv run krmanfi-search        # или run.bat / ./run.sh
 
 | ОС | Что запустить | Результат |
 |---|---|---|
-| Windows | двойной щелчок по `build_windows.bat` | `dist\KRmanfi-Search-win64.zip` (внутри `KRmanfiSearch.exe`) |
-| Linux | `./build_linux.sh` | `dist/KRmanfi-Search-linux-x64.tar.gz` (внутри `KRmanfiSearch`) |
+| Windows | двойной щелчок по `scripts\build_windows.bat` | `dist\KRmanfi-Search-win64.zip` (внутри `KRmanfiSearch.exe`) |
+| Linux | `scripts/build_linux.sh` | `dist/KRmanfi-Search-linux-x64.tar.gz` (внутри `KRmanfiSearch`) |
 
 Собирать нужно на той ОС, для которой нужен файл. Скрипт сам создаёт окружение, запускает
 PyInstaller, встраивает Tesseract (если он установлен на машине сборки — в Windows скрипт
