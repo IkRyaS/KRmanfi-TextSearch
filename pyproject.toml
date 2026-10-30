@@ -23,6 +23,7 @@ dependencies = [
     "openpyxl==3.1.5",
     "python-pptx==1.0.2",
     "pytesseract==0.3.13",
+    "colorama>=0.4.6",
 ]
 
 [project.optional-dependencies]
@@ -31,7 +32,6 @@ dev = [
     "pytest-qt==4.5.0",
     "ruff==0.16.10",
     "pyinstaller==6.22.3",
-    "reportlab==5.1.0",
     "patchelf==0.17.2.4; sys_platform == 'linux'",
 ]
 

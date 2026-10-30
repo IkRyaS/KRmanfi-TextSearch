@@ -5,4 +5,4 @@ if ! command -v uv >/dev/null 2>&1; then
     echo "Не найден uv: curl -LsSf https://astral.sh/uv/install.sh | sh" >&2
     exit 1
 fi
-exec uv run krmanfi-search "$@"
+exec uv run --python 3.13 krmanfi-search "$@"

@@ -14,6 +14,8 @@ def isolated(monkeypatch, tmp_path):
     runtime.vendor_tessdata.cache_clear()
     monkeypatch.setenv("KRMANFI_VENDOR_DIR", str(tmp_path / "no_vendor"))
     monkeypatch.delenv("TESSERACT_CMD", raising=False)
+    for variable in ("PROGRAMFILES", "PROGRAMFILES(X86)", "LOCALAPPDATA"):
+        monkeypatch.delenv(variable, raising=False)
     monkeypatch.setattr(tesseract, "which", lambda binary: None)
     monkeypatch.setattr(tesseract, "vendor_tesseract", lambda: None)
     yield
