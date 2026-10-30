@@ -373,7 +373,7 @@ def test_show_hit_routes_other_formats_to_default_program(qtbot, window, monkeyp
     monkeypatch.setattr(QDesktopServices, "openUrl", lambda url: opened.append(url) or True)
     hit = find_hit(window, "04_протокол.docx")
     window.show_hit(hit)
-    assert opened and opened[0].toLocalFile() == str(hit.real_path)
+    assert opened and Path(opened[0].toLocalFile()) == Path(hit.real_path)
     assert not window.error_label.isVisible()
 
 

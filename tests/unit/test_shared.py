@@ -151,6 +151,7 @@ def test_frozen_child_environment_restores_system_libraries(monkeypatch):
 
 
 def test_no_window_flags_per_platform(monkeypatch):
+    monkeypatch.setattr(sys, "platform", "linux")
     assert process.no_window_flags() == 0
     monkeypatch.setattr(sys, "platform", "win32")
     monkeypatch.setattr(subprocess, "CREATE_NO_WINDOW", 0x08000000, raising=False)

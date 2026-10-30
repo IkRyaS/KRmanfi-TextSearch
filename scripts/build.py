@@ -31,7 +31,7 @@ TOP = "KRmanfi-Search"
 IS_WINDOWS = sys.platform == "win32"
 IS_LINUX = sys.platform.startswith("linux")
 EXTRA_FILES = ("README.md", "LICENSE", "THIRD_PARTY_NOTICES.md", "settings.toml")
-LINUX_FILES = ("setup_linux.sh",)
+LINUX_FILES = ("scripts/setup_linux.sh",)
 EXECUTABLES = ("KRmanfiSearch", "setup_linux.sh")
 
 
@@ -50,7 +50,7 @@ def clean():
 def run_pyinstaller():
     """Собрать папку ``dist/KRmanfiSearch`` по ``krmanfi_search.spec``."""
     command = [sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean"]
-    subprocess.run([*command, str(ROOT / "krmanfi_search.spec")], cwd=ROOT, check=True)
+    subprocess.run([*command, str(ROOT / "scripts" / "krmanfi_search.spec")], cwd=ROOT, check=True)
     if not APP.is_dir():
         raise SystemExit("PyInstaller не создал dist/KRmanfiSearch")
 
@@ -76,7 +76,7 @@ def stage():
         shutil.rmtree(metadata)
     names = EXTRA_FILES + (LINUX_FILES if IS_LINUX else ())
     for name in names:
-        shutil.copy2(ROOT / name, target / name)
+        shutil.copy2(ROOT / name, target / Path(name).name)
     shutil.copytree(ROOT / "demo", target / "demo")
     for name in EXECUTABLES:
         path = target / name

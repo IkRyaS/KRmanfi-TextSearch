@@ -22,12 +22,12 @@ KRmanfi Text Search распространяется по лицензии **GNU
 | [openpyxl](https://openpyxl.readthedocs.io/) | 3.1.5 | MIT | чтение XLSX |
 | [python-pptx](https://github.com/scanny/python-pptx) | 1.0.2 | MIT | чтение PPTX |
 | [PyInstaller](https://pyinstaller.org/) | 6.22.3 | GPL-2.0-or-later с исключением для сборки любых программ | только сборка; загрузчик входит в готовые архивы |
-| [DejaVu Sans](https://dejavu-fonts.github.io/) | — | Bitstream Vera / свободная | шрифт, использованный при создании демо-файлов (`scripts/make_demo.py`) |
+| [DejaVu Sans](https://dejavu-fonts.github.io/) | — | Bitstream Vera / свободная | шрифт, использованный при создании демо-файлов |
 
 Python-библиотеки в готовых сборках лежат отдельными файлами в папке `_internal`, их лицензии
 находятся рядом с пакетами (`*.dist-info`). Установочный пакет Tesseract для Windows
 (UB-Mannheim) распространяется по Apache-2.0; в `vendor/tesseract` копируются его программа,
 библиотеки и языковые данные без изменений.
 
-Демо-файлы в папке `demo` синтетические, созданы скриптом `scripts/make_demo.py` и не содержат
+Демо-файлы в папке `demo` синтетические и не содержат
 личных данных.

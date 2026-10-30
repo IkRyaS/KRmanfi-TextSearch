@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 import tempfile
 import time
@@ -336,7 +337,7 @@ class SearchWindow(QMainWindow):
         """Подставить перетащенный путь в поле «Где искать»."""
         urls = event.mimeData().urls()
         if urls and urls[0].isLocalFile():
-            self.path_edit.setText(urls[0].toLocalFile())
+            self.path_edit.setText(os.path.normpath(urls[0].toLocalFile()))
 
     def _choose_folder(self):
         """Выбрать папку для поиска."""
