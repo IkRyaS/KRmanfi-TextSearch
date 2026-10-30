@@ -1,1 +1,0 @@
-Служебный файл: создаёт папку на диске в сборке PyInstaller (нужно python-docx и python-pptx).
