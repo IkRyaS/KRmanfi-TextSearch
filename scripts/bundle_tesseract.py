@@ -1,12 +1,3 @@
-"""Копирует Tesseract с языками rus, eng, osd в ``<сборка>/vendor/tesseract``.
-
-Windows: берётся установленный Tesseract-OCR (``winget install UB-Mannheim.TesseractOCR``),
-недостающие языки скачиваются с GitHub (tessdata_fast) — только на машине сборки.
-Linux: копируются ``tesseract`` и его библиотеки (кроме glibc), RPATH меняется на ``$ORIGIN/lib``.
-
-Вызывается из ``scripts/build.py``.
-"""
-
 from __future__ import annotations
 
 import os

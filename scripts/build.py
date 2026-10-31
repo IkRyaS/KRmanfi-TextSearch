@@ -1,15 +1,3 @@
-"""Сборка программы в готовый архив: PyInstaller → встроенный Tesseract → zip / tar.gz.
-
-Запускается через uv (см. ``build_windows.bat`` и ``build_linux.sh``)::
-
-    uv run --extra dev python scripts/build.py
-
-Результат в папке ``dist``:
-
-* Windows: ``KRmanfi-Search-win64.zip`` (внутри ``KRmanfiSearch.exe``);
-* Linux: ``KRmanfi-Search-linux-x64.tar.gz`` (внутри ``KRmanfiSearch``).
-"""
-
 from __future__ import annotations
 
 import hashlib

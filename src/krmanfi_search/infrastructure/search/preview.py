@@ -1,5 +1,3 @@
-"""Картинка страницы PDF с рамками вокруг найденных фрагментов."""
-
 from __future__ import annotations
 
 from collections.abc import Sequence

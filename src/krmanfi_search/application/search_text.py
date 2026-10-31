@@ -1,5 +1,3 @@
-"""Сценарий SearchText: проверка запроса и запуск движка."""
-
 from __future__ import annotations
 
 import os

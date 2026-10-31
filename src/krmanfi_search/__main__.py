@@ -1,5 +1,3 @@
-"""Точка входа: ``python -m krmanfi_search [путь]`` или ``uv run krmanfi-search [путь]``."""
-
 from __future__ import annotations
 
 import argparse

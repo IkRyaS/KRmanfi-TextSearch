@@ -1,5 +1,3 @@
-"""Мягкий импорт модулей и поиск внешних программ."""
-
 from __future__ import annotations
 
 import importlib

@@ -1,5 +1,3 @@
-"""Image preprocessing for OCR: upscale, denoise, deskew, binarize, despeckle, orientation."""
-
 from __future__ import annotations
 
 import io
@@ -16,7 +14,7 @@ type Gray = npt.NDArray[np.uint8]
 
 @dataclass(frozen=True, slots=True)
 class PreprocessOptions:
-    """Which steps to apply."""
+    """Какие шаги предобработки применять."""
 
     upscale_min_side: int = 1000
     denoise: bool = True
@@ -31,11 +29,11 @@ NLMEANS_MAX_PIXELS = 4_000_000
 
 
 def normalize_illumination(gray: Gray):
-    """Flatten uneven lighting (phone photos, shadows, vignetting).
+    """Выровнять неравномерное освещение (фото с телефона, тени, виньетирование).
 
-    The page background is estimated as a heavily smoothed maximum of a downscaled
-    copy (dark text strokes disappear under the max filter) and every pixel is
-    divided by it, so the paper becomes uniformly white and the text uniformly dark.
+    Фон страницы оценивается как сильно размытый максимум уменьшенной копии (тёмные штрихи
+    текста под максимальным фильтром исчезают), и каждый пиксель делится на этот фон: бумага
+    становится равномерно белой, а текст — равномерно тёмным.
     """
     img = Image.fromarray(gray)
     factor = max(1, min(img.size) // 200)
@@ -48,7 +46,7 @@ def normalize_illumination(gray: Gray):
 
 
 def otsu_threshold(gray: Gray):
-    """Otsu's global threshold (maximises between-class variance)."""
+    """Глобальный порог Оцу (максимизирует межклассовую дисперсию)."""
     hist = np.bincount(gray.ravel(), minlength=256).astype(np.float64)
     total = gray.size
     if total == 0:
@@ -63,7 +61,7 @@ def otsu_threshold(gray: Gray):
 
 
 def sauvola(gray: Gray, window: int = 25, k: float = 0.2, r: float = 128.0):
-    """Sauvola local thresholding using integral images (robust to uneven lighting)."""
+    """Локальная бинаризация Саууолы по интегральным изображениям (устойчива к неровному свету)."""
     img = gray.astype(np.float64)
     pad = window // 2
     padded = np.pad(img, pad + 1, mode="reflect")
@@ -73,7 +71,7 @@ def sauvola(gray: Gray, window: int = 25, k: float = 0.2, r: float = 128.0):
     y0, x0 = np.arange(h), np.arange(w)
 
     def box(ii: npt.NDArray[np.float64]):
-        """Sum of pixel values in every ``window`` box using an integral image."""
+        """Сумма значений пикселей в каждом окне ``window`` по интегральному изображению."""
         y1, x1 = y0[:, None] + 1, x0[None, :] + 1
         y2, x2 = y1 + window, x1 + window
         return np.asarray(ii[y2, x2] - ii[y1, x2] - ii[y2, x1] + ii[y1, x1], dtype=np.float64)
@@ -86,7 +84,7 @@ def sauvola(gray: Gray, window: int = 25, k: float = 0.2, r: float = 128.0):
 
 
 def estimate_skew(gray: Gray, max_angle: float = 15.0):
-    """Skew angle (degrees) by maximising the variance of horizontal projection profiles."""
+    """Угол наклона в градусах: максимум дисперсии горизонтальной проекции при повороте."""
     small = Image.fromarray(gray)
     small.thumbnail((800, 800))
     arr = normalize_illumination(np.asarray(small, dtype=np.uint8))
@@ -96,7 +94,7 @@ def estimate_skew(gray: Gray, max_angle: float = 15.0):
     img = Image.fromarray((binary * 255).astype(np.uint8))
 
     def score(angle: float):
-        """Variance of the horizontal projection profile after rotating by ``angle``."""
+        """Дисперсия профиля горизонтальной проекции после поворота на угол ``angle``."""
         rotated = np.asarray(img.rotate(angle, resample=Image.Resampling.BILINEAR, expand=True))
         profile = rotated.sum(axis=1, dtype=np.float64)
         return float(np.var(profile))
@@ -108,7 +106,7 @@ def estimate_skew(gray: Gray, max_angle: float = 15.0):
 
 
 def despeckle(binary: Gray, min_area: int = 6):
-    """Remove tiny connected components (noise dots) from a black-on-white image."""
+    """Убрать мелкие связные области (точки шума) на чёрно-белом изображении."""
     cv2 = optional_import("cv2")
     if cv2 is None:
         return np.asarray(
@@ -123,14 +121,14 @@ def despeckle(binary: Gray, min_area: int = 6):
 
 
 def preprocess(image: Image.Image, opts: PreprocessOptions):
-    """Run the preprocessing pipeline.
+    """Выполнить цепочку предобработки.
 
     Args:
-        image: Input image (any mode).
-        opts: Options.
+        image: Исходное изображение (любого режима).
+        opts: Параметры.
 
     Returns:
-        ``(processed_grayscale_image, report)`` where report lists applied steps.
+        ``(обработанное_серое_изображение, отчёт)``; отчёт перечисляет применённые шаги.
     """
     report = {}
     img = ImageOps.exif_transpose(image).convert("L")
@@ -207,7 +205,7 @@ def geometry_preview(image: Image.Image, opts: PreprocessOptions, report: dict):
 
 
 def detect_orientation(image: Image.Image):
-    """Text rotation (0/90/180/270) through Tesseract OSD; 0 if unavailable."""
+    """Поворот текста (0/90/180/270) по данным Tesseract OSD; 0, если недоступно."""
     pytesseract = optional_import("pytesseract")
     if pytesseract is None:
         return 0
@@ -219,7 +217,7 @@ def detect_orientation(image: Image.Image):
 
 
 def png_bytes(image: Image.Image):
-    """Encode as PNG."""
+    """Закодировать изображение в PNG."""
     buf = io.BytesIO()
     image.save(buf, "PNG")
     return buf.getvalue()

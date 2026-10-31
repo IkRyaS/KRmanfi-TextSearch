@@ -1,5 +1,3 @@
-"""Запуск внешних программ: без shell, с таймаутом и без окна консоли в Windows."""
-
 from __future__ import annotations
 
 import os

@@ -1,5 +1,3 @@
-"""Движок поиска: обход папки, распаковка ZIP, извлечение текста в процессах, сопоставление."""
-
 from __future__ import annotations
 
 import contextlib

@@ -1,5 +1,3 @@
-"""Проверки конфигурации: версия и файл настроек."""
-
 import tomllib
 from pathlib import Path
 

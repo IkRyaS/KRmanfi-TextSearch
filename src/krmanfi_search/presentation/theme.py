@@ -1,5 +1,3 @@
-"""Оформление: один цвет в разных оттенках (бирюзовый) и нейтральные серо-синие тона."""
-
 from __future__ import annotations
 
 from PySide6.QtGui import QColor

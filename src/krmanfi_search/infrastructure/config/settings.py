@@ -1,5 +1,3 @@
-"""Загрузка настроек из TOML с безопасными значениями по умолчанию."""
-
 from __future__ import annotations
 
 import tomllib

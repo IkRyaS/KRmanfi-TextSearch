@@ -1,13 +1,3 @@
-"""Спецификация PyInstaller: папочная сборка «Поиск по документам».
-
-Запускается из ``scripts/build.py`` (``build_windows.bat`` / ``build_linux.sh``).
-Результат: ``dist/KRmanfiSearch/KRmanfiSearch[.exe]``.
-
-python-docx и python-pptx читают шаблоны по путям вида ``<пакет>/parts/../templates``; такие
-пути работают, только если папка ``parts`` физически есть на диске, поэтому в сборку
-добавляются файлы-заглушки.
-"""
-
 import sys
 from pathlib import Path
 

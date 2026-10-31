@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.13"
 
 [[package]]
@@ -52,7 +52,6 @@ name = "krmanfi-search"
 version = "1.0.0"
 source = { editable = "." }
 dependencies = [
-    { name = "colorama" },
     { name = "numpy" },
     { name = "opencv-python-headless" },
     { name = "openpyxl" },
@@ -78,7 +77,6 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "colorama", specifier = ">=0.4.6" },
     { name = "numpy", specifier = "==2.5.3" },
     { name = "opencv-python-headless", specifier = "==4.14.0.94" },
     { name = "openpyxl", specifier = "==3.1.5" },

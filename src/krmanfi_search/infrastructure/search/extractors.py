@@ -1,5 +1,3 @@
-"""Извлечение текста по форматам: каждый кусок получает метку места."""
-
 from __future__ import annotations
 
 from collections.abc import Callable

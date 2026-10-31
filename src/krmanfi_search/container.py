@@ -1,5 +1,3 @@
-"""Ручное связывание зависимостей (DI)."""
-
 from __future__ import annotations
 
 import functools

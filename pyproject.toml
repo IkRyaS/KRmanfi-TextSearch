@@ -23,7 +23,6 @@ dependencies = [
     "openpyxl==3.1.5",
     "python-pptx==1.0.2",
     "pytesseract==0.3.13",
-    "colorama>=0.4.6",
 ]
 
 [project.optional-dependencies]
@@ -48,7 +47,7 @@ src = ["src", "tests", "scripts"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM", "D", "ANN", "PLR0911", "RUF"]
-ignore = ["D203", "D213", "ANN201", "ANN202", "ANN204", "ANN205", "ANN206", "RUF001", "RUF002", "RUF003"]
+ignore = ["D100", "D104", "D203", "D213", "ANN201", "ANN202", "ANN204", "ANN205", "ANN206", "RUF001", "RUF002", "RUF003"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["D", "ANN"]

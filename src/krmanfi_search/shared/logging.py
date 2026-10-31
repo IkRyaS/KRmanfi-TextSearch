@@ -1,10 +1,3 @@
-"""structlog configuration: console (stderr) plus a rotating log file.
-
-The log file lives in :func:`krmanfi_search.shared.runtime.log_dir` (``krmanfi-search.log``,
-5 MB × 3 files). It is the only diagnostic channel of the windowed Windows build,
-where ``sys.stderr`` is ``None``.
-"""
-
 from __future__ import annotations
 
 import contextlib
@@ -30,29 +23,29 @@ STRUCTLOG_RECORD = "krmanfi_search.structlog"
 
 
 class _FileFormatter(logging.Formatter):
-    """structlog lines are already rendered; stdlib records get a time stamp and level."""
+    """Строки structlog уже отрисованы; записям stdlib добавляется отметка времени."""
 
     def __init__(self):
-        """Use the stdlib layout for foreign records."""
+        """Использовать формат stdlib для чужих записей."""
         super().__init__("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
     def format(self, record: logging.LogRecord):
-        """Render one record."""
+        """Отрисовать одну запись."""
         if record.name == STRUCTLOG_RECORD:
             return record.getMessage()
         return super().format(record)
 
 
 class _Stderr:
-    """Late-bound ``sys.stderr``.
+    """Поток ``sys.stderr``, который определяется в момент записи.
 
-    * GUI launchers on Windows (pythonw) have ``sys.stderr is None``: writes are dropped;
-    * the current ``sys.stderr`` is looked up on every write, so redirections (tests,
-      IDE consoles) never leave loggers pointing at a closed stream.
+    * У оконных запусков Windows (pythonw) ``sys.stderr is None``: запись отбрасывается;
+    * текущий ``sys.stderr`` берётся при каждой записи, поэтому перенаправления (тесты,
+      консоли IDE) не оставляют логгеры на закрытом потоке.
     """
 
     def write(self, text: str):
-        """Write to the current ``sys.stderr`` if there is one."""
+        """Записать в текущий ``sys.stderr``, если он есть."""
         stream = sys.stderr
         if stream is None:
             return len(text)
@@ -65,14 +58,14 @@ class _Stderr:
             return len(text)
 
     def flush(self):
-        """Flush the current ``sys.stderr``."""
+        """Сбросить буфер текущего ``sys.stderr``."""
         stream = sys.stderr
         if stream is not None:
             with contextlib.suppress(ValueError, OSError):
                 stream.flush()
 
     def isatty(self):
-        """Whether the current ``sys.stderr`` is a terminal."""
+        """Является ли текущий ``sys.stderr`` терминалом."""
         stream = sys.stderr
         try:
             return bool(stream is not None and stream.isatty())
@@ -81,17 +74,17 @@ class _Stderr:
 
 
 class StderrLogger:
-    """structlog logger that prints rendered events to stderr and the log file.
+    """Логгер structlog: печатает готовые события в stderr и в файл журнала.
 
-    Standard output stays reserved for data: ``--analyze`` prints JSON there.
+    Стандартный вывод остаётся для данных.
     """
 
     def __init__(self, stream: _Stderr):
-        """Bind the late-bound stream."""
+        """Привязать поток, определяемый в момент записи."""
         self._stream = stream
 
     def msg(self, message: str):
-        """Print one rendered log line."""
+        """Напечатать одну готовую строку журнала."""
         self._stream.write(message + "\n")
         self._stream.flush()
         handler = _STATE.get("file")
@@ -105,12 +98,12 @@ class StderrLogger:
 
 
 def log_file():
-    """Path of the current log file."""
+    """Путь к текущему файлу журнала."""
     return log_dir() / LOG_FILE_NAME
 
 
 def _file_handler(level: int):
-    """Rotating UTF-8 file handler, or ``None`` if the folder is not writable."""
+    """Файловый обработчик с ротацией (UTF-8) или ``None``, если папка недоступна для записи."""
     try:
         folder = log_dir()
         folder.mkdir(parents=True, exist_ok=True)
@@ -130,12 +123,12 @@ def _file_handler(level: int):
 
 
 def configure_logging(level: str = "INFO", json: bool = False, to_file: bool = True):
-    """Configure structlog + stdlib logging once at start-up.
+    """Один раз при запуске настроить structlog и стандартное логирование.
 
     Args:
-        level: Log level name.
-        json: Emit JSON lines instead of coloured console output.
-        to_file: Also write the rotating log file.
+        level: Имя уровня журнала.
+        json: Выводить строки JSON вместо цветной консоли.
+        to_file: Дополнительно писать файл журнала с ротацией.
     """
     numeric = logging.getLevelNamesMapping().get(level.upper(), logging.INFO)
     stream = _Stderr()
@@ -171,17 +164,17 @@ def configure_logging(level: str = "INFO", json: bool = False, to_file: bool = T
 
 
 def install_excepthooks(on_error: Callable[[str], object] | None = None):
-    """Log uncaught exceptions of the main thread and of worker threads.
+    """Записывать в журнал необработанные исключения главного потока и рабочих потоков.
 
     Args:
-        on_error: Optional ``callable(text)`` that shows the error to the user.
+        on_error: Необязательная функция ``callable(текст)``, показывающая ошибку пользователю.
     """
     log = get_logger("krmanfi_search.crash")
 
     def report(
         kind: str, exc_type: type[BaseException], exc: BaseException, tb: TracebackType | None
     ):
-        """Write the traceback to the log and notify the UI."""
+        """Записать трассировку в журнал и сообщить окну."""
         if issubclass(exc_type, KeyboardInterrupt):
             return
         text = "".join(traceback.format_exception(exc_type, exc, tb))
@@ -191,11 +184,11 @@ def install_excepthooks(on_error: Callable[[str], object] | None = None):
                 on_error(f"{exc_type.__name__}: {exc}")
 
     def main_hook(exc_type: type[BaseException], exc: BaseException, tb: TracebackType | None):
-        """``sys.excepthook``."""
+        """Обработчик ``sys.excepthook``."""
         report("main", exc_type, exc, tb)
 
     def thread_hook(args: threading.ExceptHookArgs):
-        """``threading.excepthook``."""
+        """Обработчик ``threading.excepthook``."""
         if args.exc_type is not None and args.exc_value is not None:
             name = args.thread.name if args.thread else "?"
             report(f"thread {name}", args.exc_type, args.exc_value, args.exc_traceback)
@@ -205,5 +198,5 @@ def install_excepthooks(on_error: Callable[[str], object] | None = None):
 
 
 def get_logger(name: str):
-    """Return a bound logger for ``name``."""
+    """Вернуть привязанный логгер для ``name``."""
     return structlog.get_logger(name)

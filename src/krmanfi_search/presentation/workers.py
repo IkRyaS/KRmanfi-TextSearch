@@ -1,5 +1,3 @@
-"""Background jobs on ``QThreadPool`` with Qt-signal progress (Observer) and cancellation."""
-
 from __future__ import annotations
 
 import functools
@@ -21,7 +19,7 @@ type JobFunc = Callable[[CancelToken, ProgressCallback, Emit], object]
 
 
 class WorkerSignals(QObject):
-    """Signals are delivered to the GUI thread via queued connections."""
+    """Сигналы доставляются в поток окна через очередь событий Qt."""
 
     progress = Signal(object, object, str)
     item = Signal(object)
@@ -32,10 +30,10 @@ class WorkerSignals(QObject):
 
 
 class Worker(QRunnable):
-    """Runs ``func(cancel, progress, emit)`` in the thread pool."""
+    """Выполняет ``func(cancel, progress, emit)`` в пуле потоков."""
 
     def __init__(self, func: JobFunc):
-        """Wrap ``func``."""
+        """Обернуть функцию ``func``."""
         super().__init__()
         self.setAutoDelete(True)
         self.func = func
@@ -44,16 +42,16 @@ class Worker(QRunnable):
         self.detached = False
 
     def cancel(self):
-        """Request cooperative cancellation (``finished`` / ``cancelled`` still arrive)."""
+        """Запросить мягкую отмену (сигналы ``finished`` и ``cancelled`` всё равно придут)."""
         self.cancel_token.cancel()
 
     def detach(self):
-        """Cancel and drop every further signal: used when a new run replaces this one."""
+        """Отменить и отбросить все дальнейшие сигналы: нужно, когда новый запуск заменяет этот."""
         self.detached = True
         self.cancel_token.cancel()
 
     def run(self):
-        """QRunnable entry point."""
+        """Точка входа ``QRunnable``."""
         sig = self.signals
         try:
             out = self.func(self.cancel_token, self._progress, self._emit)
@@ -73,23 +71,23 @@ class Worker(QRunnable):
             sig.finished.emit()
 
     def _progress(self, done: int, total: int, message: str):
-        """Forward progress to the GUI thread."""
+        """Передать прогресс в поток окна."""
         self.signals.progress.emit(done, total, message)
 
     def _emit(self, obj: object):
-        """Forward an intermediate item to the GUI thread."""
+        """Передать промежуточный элемент в поток окна."""
         self.signals.item.emit(obj)
 
 
 def _guarded(worker: Worker, name: str, slot: Callable[..., Any], owner: QObject | None):
-    """Wrap a slot: skip detached workers and deleted widgets, log slot exceptions.
+    """Обернуть слот: пропускать отсоединённые задачи и удалённые виджеты, логировать исключения.
 
-    An exception escaping a Qt slot is only printed by PySide6 (and lost in the
-    windowed build) and leaves the UI half updated, so it is logged here instead.
+    Исключение, вылетевшее из слота Qt, PySide6 лишь печатает (в оконной сборке оно теряется),
+    а окно остаётся обновлённым наполовину, поэтому здесь оно пишется в журнал.
     """
 
     def call(*args: object):
-        """Deliver the signal if the receiver still wants it."""
+        """Доставить сигнал, если получатель всё ещё его ждёт."""
         if worker.detached:
             return
         if owner is not None and not shiboken6.isValid(owner):
@@ -113,12 +111,12 @@ def submit(
     pool: QThreadPool | None = None,
     **slots: Callable[..., Any],
 ):
-    """Create a worker, connect ``slots`` (by signal name) and start it.
+    """Создать задачу, подключить ``slots`` (по именам сигналов) и запустить её.
 
     Args:
-        func: ``func(cancel, progress, emit)`` run in a pool thread.
-        owner: Widget the results are for; signals are dropped once it is deleted.
-        pool: Thread pool (default: the global one).
+        func: ``func(cancel, progress, emit)``, выполняется в потоке пула.
+        owner: Виджет, для которого нужны результаты; после его удаления сигналы отбрасываются.
+        pool: Пул потоков (по умолчанию глобальный).
         **slots: ``progress``, ``item``, ``result``, ``error``, ``cancelled``, ``finished``.
 
     Example:
@@ -133,7 +131,7 @@ def submit(
 
 @functools.cache
 def listing_pool():
-    """Small dedicated pool for directory listings, never blocked by long analyses."""
+    """Небольшой отдельный пул для просмотра папок: его не блокируют долгие анализы."""
     pool = QThreadPool()
     pool.setMaxThreadCount(2)
     return pool

@@ -1,5 +1,3 @@
-"""Иерархия ошибок приложения."""
-
 from __future__ import annotations
 
 

@@ -1,5 +1,3 @@
-"""Дерево результатов: файл → страница → вхождения (строится по мере поступления)."""
-
 from __future__ import annotations
 
 from enum import StrEnum

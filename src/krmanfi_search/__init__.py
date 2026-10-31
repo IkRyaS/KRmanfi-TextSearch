@@ -1,5 +1,3 @@
-"""KRmanfi Text Search: поиск текста в документах, сканах PDF и ZIP-архивах."""
-
 from importlib.metadata import PackageNotFoundError, version
 
 try:

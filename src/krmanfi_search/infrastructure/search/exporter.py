@@ -1,5 +1,3 @@
-"""Экспорт совпадений в CSV (UTF-8 с BOM, чтобы Excel определил кодировку)."""
-
 from __future__ import annotations
 
 import csv

@@ -1,5 +1,3 @@
-"""Shared type aliases (PEP 695 ``type`` statements)."""
-
 from __future__ import annotations
 
 import threading
@@ -10,32 +8,32 @@ type JsonValue = JsonScalar | list[JsonValue] | dict[str, JsonValue]
 type JsonDict = dict[str, JsonValue]
 
 type ProgressCallback = Callable[[int, int, str], None]
-"""``callback(done, total, message)``; ``total == 0`` means indeterminate."""
+"""``callback(done, total, message)``; ``total == 0`` означает неопределённый прогресс."""
 
 
 class CancelToken:
-    """Cooperative cancellation flag shared between UI and worker threads."""
+    """Флаг мягкой отмены, общий для потока окна и рабочих потоков."""
 
     __slots__ = ("_event",)
 
     def __init__(self):
-        """Create a non-cancelled token."""
+        """Создать токен без отмены."""
         self._event = threading.Event()
 
     def cancel(self):
-        """Request cancellation."""
+        """Запросить отмену."""
         self._event.set()
 
     @property
     def cancelled(self):
-        """Whether cancellation has been requested."""
+        """Запрошена ли отмена."""
         return self._event.is_set()
 
     def raise_if_cancelled(self):
-        """Raise :class:`OperationCancelledError` when cancelled.
+        """Выбросить :class:`OperationCancelledError`, если отмена запрошена.
 
         Raises:
-            OperationCancelledError: If :meth:`cancel` was called.
+            OperationCancelledError: Если был вызван :meth:`cancel`.
         """
         if self._event.is_set():
             from krmanfi_search.shared.exceptions import OperationCancelledError
@@ -44,5 +42,5 @@ class CancelToken:
 
 
 def noop_progress(done: int, total: int, message: str):
-    """Progress callback that ignores everything."""
+    """Колбэк прогресса, который ничего не делает."""
     del done, total, message

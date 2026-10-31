@@ -1,5 +1,3 @@
-"""Tesseract через pytesseract: поиск программы и распознавание изображения."""
-
 from __future__ import annotations
 
 import io
